@@ -16,8 +16,8 @@ class Donor(models.Model):
     country = models.CharField(max_length=30, default='')
     reg_date = models.DateTimeField(default=datetime.now, blank=True)
 
-    # def __str__(self):
-    #     return self.email
+    def __str__(self):
+        return self.user.username
 
     def was_reg_recently(self):
         now = timezone.now()
@@ -31,6 +31,7 @@ class Donor(models.Model):
 def create_profile(sender, **kwargs):
     if kwargs['created']:
         user_profile = Donor.objects.create(user=kwargs['instance'])
+
 
 # signal trigger
 post_save.connect(create_profile, sender=User)
