@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^confirmation/$', views.confirmation, name='confirmation'),
     # ex: /home/login/
     url(r'^login/$', login, {'template_name': 'loginsignup/login.html'}, name='login'),
+    # ex: /home/login/
+    url(r'^profile/$', views.profile, name='profile'),
     # ex: /home/logout/
     url(r'^logout/$', logout, {'template_name': 'loginsignup/logout.html'}, name='logout'),
 ]

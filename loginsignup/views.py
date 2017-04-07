@@ -40,6 +40,11 @@ def signup(request):
         form = RegistrationForm()
         return render(request, 'loginsignup/signup.html', {'form': form})
 
+
+def profile(request):
+    args = {'user': request.user}
+    return render(request, 'loginsignup/profile.html', args)
+
 # def vote(request, question_id):
 #     question = get_object_or_404(Donor, pk=question_id)
 #     try:
