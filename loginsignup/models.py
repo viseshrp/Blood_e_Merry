@@ -32,6 +32,6 @@ def create_profile(sender, **kwargs):
     if kwargs['created']:
         user_profile = Donor.objects.create(user=kwargs['instance'])
 
-
+# signal trigger
 post_save.connect(create_profile, sender=User)
 # use post_save to trigger tweepy later
