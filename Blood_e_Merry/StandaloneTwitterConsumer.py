@@ -112,7 +112,7 @@ class TwilioThread(threading.Thread):
                                                      from_=bemconstants.twilio_phone_nbr)
         self.sample_coll.update_one(
             {"_id": msg['_id']},
-            {'$set' : {
+            {'$set': {
                 'is_expired': True
             }
             })
