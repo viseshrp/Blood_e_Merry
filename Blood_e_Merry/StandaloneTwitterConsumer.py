@@ -102,7 +102,8 @@ class TwilioThread(threading.Thread):
             time.sleep(bemconstants.msg_check_seconds)
             print('Checking for new Messages....')
             messages = self.sample_coll.find(bemconstants.query)
-            for msg in messages: self.send_twilio_sms(msg)
+            for msg in messages:
+                self.send_twilio_sms(msg)
         self.mongo_client.close()
         print('Stopping Twilio Thread...')
 
@@ -116,7 +117,7 @@ class TwilioThread(threading.Thread):
                 'is_expired': True
             }
             })
-        print('Sent one message::: {}'.format(message))
+        print('Sent one message::: {}'.format(msg['text']))
 
 
 def main():
@@ -129,7 +130,7 @@ def main():
     cmd = 'a'
 
     while cmd != 'stop':
-        cmd = input("COMMAND: ")
+        cmd = input("")
 
     twilio_thread.signal = False
     # my_stream_listener.on_error(123)
