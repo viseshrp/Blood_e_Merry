@@ -28,6 +28,7 @@
                 {% if user.is_authenticated %}
                     <ul class="nav navbar-nav">
                         <li><a href="{% url 'loginsignup:home' %}">Home</a></li>
+                        <li><a href="{% url 'loginsignup:profile' %}">Profile</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="{% url 'loginsignup:logout' %}">Log out</a></li>
