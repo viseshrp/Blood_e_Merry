@@ -37,6 +37,7 @@ def signup(request):
             user = form.save()
             user.is_active = False
             user.refresh_from_db()
+            user.donor.blood_group = form.cleaned_data.get('blood_group')
             user.donor.phone = form.cleaned_data.get('phone')
             user.donor.city = form.cleaned_data.get('city')
             user.donor.state = form.cleaned_data.get('state')

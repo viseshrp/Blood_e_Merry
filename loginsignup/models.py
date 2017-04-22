@@ -11,11 +11,12 @@ from django.contrib.auth.models import User
 class Donor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=10, default='')
-    city = models.CharField(max_length=10, default='')
-    state = models.CharField(max_length=10, default='')
+    city = models.CharField(max_length=30, default='')
+    state = models.CharField(max_length=30, default='')
     country = models.CharField(max_length=30, default='')
     reg_date = models.DateTimeField(default=datetime.now, blank=True)
     email_confirmed = models.BooleanField(default=False)
+    blood_group = models.CharField(max_length=2, default='')
 
     def __str__(self):
         return self.user.username

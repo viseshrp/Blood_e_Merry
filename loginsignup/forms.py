@@ -6,11 +6,12 @@ from loginsignup.models import Donor
 
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True, help_text='Required. Provide a valid email address.')
-    phone = forms.CharField(required=True, help_text='Required.')
-    city = forms.CharField(required=True, help_text='Required.')
-    state = forms.CharField(required=True, help_text='Required.')
-    country = forms.CharField(required=True, help_text='Required.')
+    email = forms.EmailField(required=True, help_text='Required. Provide a valid email address.', max_length=30)
+    phone = forms.CharField(required=True, help_text='Required.', max_length=10)
+    city = forms.CharField(required=True, help_text='Required.', max_length=30)
+    state = forms.CharField(required=True, help_text='Required.',  max_length=30)
+    country = forms.CharField(required=True, help_text='Required.', max_length=30)
+    blood_group = forms.CharField(required=True, help_text='Required. Example: B+', max_length=2)
 
     class Meta:
         model = User
@@ -21,6 +22,7 @@ class RegistrationForm(UserCreationForm):
             'email',
             'password1',
             'password2',
+            'blood_group',
             'phone',
             'city',
             'state',
