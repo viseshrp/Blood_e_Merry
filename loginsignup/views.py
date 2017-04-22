@@ -1,12 +1,19 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 import logging
+
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from ipware.ip import get_ip
 
 from loginsignup.forms import RegistrationForm
+from loginsignup.tokens import account_activation_token
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +35,7 @@ def signup(request):
         form = RegistrationForm(request.POST)  # takes the post data from request
         if form.is_valid():
             user = form.save()
+            user.is_active = False
             user.refresh_from_db()
             user.donor.phone = form.cleaned_data.get('phone')
             user.donor.city = form.cleaned_data.get('city')
@@ -35,6 +43,15 @@ def signup(request):
             user.donor.country = form.cleaned_data.get('country')
             user.save()
             user.donor.save()
+            current_site = get_current_site(request)
+            subject = 'Activate Your Blood-e-Merry Account'
+            message = render_to_string('loginsignup/activation.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            user.email_user(subject, message, from_email='visesh@bloodemerry.com')
             # raw_password = form.cleaned_data.get('password1')
             # user = authenticate(username=user.username, password=raw_password)
             # login(request, user)
@@ -59,14 +76,20 @@ def profile(request):
     logger.error('ip=' + client_address)
     return render(request, 'loginsignup/profile.html', args)
 
-# def vote(request, question_id):
-#     question = get_object_or_404(Donor, pk=question_id)
-#     try:
-#         selected_choice = question.choice_set.get(pk=request.POST['choice'])
-#     except (KeyError, Choice.DoesNotExist):
-#         # when there's no choice selected, re display the vote form
-#         return render(request, 'polls/detail.html', {'question': question, 'error_message': "No choice, idiot!", })
-#     else:
-#         selected_choice.votes += 1
-#         selected_choice.save()
-#         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.donor.email_confirmed = True
+        user.save()
+        user.donor.save()
+        login(request, user)
+        return render(request, 'loginsignup/index.html', {})
+    else:
+        return render(request, 'loginsignup/account_activation_invalid.html')
