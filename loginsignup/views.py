@@ -1,8 +1,10 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 import logging
 from django.urls import reverse
+from ipware.ip import get_ip
 
 from loginsignup.forms import RegistrationForm
 
@@ -25,7 +27,17 @@ def signup(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)  # takes the post data from request
         if form.is_valid():
-            form.save()
+            user = form.save()
+            user.refresh_from_db()
+            user.donor.phone = form.cleaned_data.get('phone')
+            user.donor.city = form.cleaned_data.get('city')
+            user.donor.state = form.cleaned_data.get('state')
+            user.donor.country = form.cleaned_data.get('country')
+            user.save()
+            user.donor.save()
+            # raw_password = form.cleaned_data.get('password1')
+            # user = authenticate(username=user.username, password=raw_password)
+            # login(request, user)
             return HttpResponseRedirect(reverse('loginsignup:confirmation'))
         else:
             logger.error('Form invalid')
@@ -43,6 +55,8 @@ def signup(request):
 
 def profile(request):
     args = {'user': request.user}
+    client_address = get_ip(request)
+    logger.error('ip=' + client_address)
     return render(request, 'loginsignup/profile.html', args)
 
 # def vote(request, question_id):

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 @python_2_unicode_compatible
 class Donor(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=10, default='')
     city = models.CharField(max_length=10, default='')
     state = models.CharField(max_length=10, default='')
@@ -28,11 +28,18 @@ class Donor(models.Model):
     was_reg_recently.short_description = 'Registered recently?'
 
 
+# create and save donor object, after saving user object
 def create_profile(sender, **kwargs):
     if kwargs['created']:
         user_profile = Donor.objects.create(user=kwargs['instance'])
 
 
-# signal trigger
+'''
+signal trigger
+Specifying sender limits the receiver
+to just post_save signals sent for saves of that particular model.
+'''
 post_save.connect(create_profile, sender=User)
+
+
 # use post_save to trigger tweepy later
