@@ -1,5 +1,5 @@
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate, login, update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from ipware.ip import get_ip
 
-from loginsignup.forms import RegistrationForm
+from loginsignup.forms import RegistrationForm, EditProfileForm
 from loginsignup.tokens import account_activation_token
 
 logger = logging.getLogger(__name__)
@@ -78,6 +78,29 @@ def profile(request):
     return render(request, 'loginsignup/profile.html', args)
 
 
+def edit_profile(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)  # takes the post data from request
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.donor.blood_group = form.cleaned_data.get('blood_group')
+            user.donor.phone = form.cleaned_data.get('phone')
+            user.donor.city = form.cleaned_data.get('city')
+            user.donor.state = form.cleaned_data.get('state')
+            user.donor.country = form.cleaned_data.get('country')
+            user.save()
+            user.donor.save()
+            return HttpResponseRedirect(reverse('loginsignup:profile'))
+        else:
+            logger.error('Form invalid')
+            return render(request, 'loginsignup/edit_profile.html', {'form': form, 'error_message': "Form data invalid!", })
+
+    else:
+        form = EditProfileForm(instance=request.user)
+        return render(request, 'loginsignup/edit_profile.html', {'form': form})
+
+
 def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -94,3 +117,19 @@ def activate(request, uidb64, token):
         return render(request, 'loginsignup/index.html', {})
     else:
         return render(request, 'loginsignup/account_activation_invalid.html')
+
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)  # takes the post data from request
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return HttpResponseRedirect(reverse('loginsignup:profile'))
+        else:
+            logger.error('Form invalid')
+            return render(request, 'loginsignup/change_password.html', {'form': form, 'error_message': "Form data invalid!", })
+
+    else:
+        form = PasswordChangeForm(user=request.user)
+        return render(request, 'loginsignup/change_password.html', {'form': form})
