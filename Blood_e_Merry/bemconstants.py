@@ -1,6 +1,6 @@
 mongo_host = "localhost"
-mongo_db = 'sample'
-mongo_db_collection = 'sample_coll'
+mongo_db = 'bloodemerrydb'
+mongo_db_collection = 'tweets_collection'
 
 trackList = ['viseshismybuddybaddy']
 trackList = ['bloodneeded']
