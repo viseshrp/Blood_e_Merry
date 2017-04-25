@@ -7,3 +7,5 @@
 Blood_e_Merry/secrets.py
 
 *.sqlite3
+
+*.txt
