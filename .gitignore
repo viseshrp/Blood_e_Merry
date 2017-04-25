@@ -5,7 +5,3 @@
 .idea/Blood_e_Merry.iml
 
 Blood_e_Merry/secrets.py
-
-*.sqlite3
-
-*.txt
