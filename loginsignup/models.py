@@ -54,7 +54,7 @@ post_save.connect(create_profile, sender=User)
 def tweepy_tester(sender, **kwargs):
     if kwargs['created']:
         logger.error('tweepy trigger-start!')
-        p = subprocess.Popen([sys.executable, "/Users/viseshprasad/PycharmProjects/Blood_e_Merry/loginsignup/tests.py"],
+        p = subprocess.Popen([sys.executable, "/Users/viseshprasad/PycharmProjects/Blood_e_Merry/loginsignup/threadtest.py"],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT)
         logger.error('tweepy trigger-over!')
