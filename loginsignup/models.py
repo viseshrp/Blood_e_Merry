@@ -61,4 +61,4 @@ def tweepy_tester(sender, **kwargs):
 
 
 # use post_save to trigger tweepy later
-post_save.connect(tweepy_tester, sender=User)
+# post_save.connect(tweepy_tester, sender=User)

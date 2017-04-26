@@ -25,7 +25,7 @@ twilio_msg_template = '\n### Emergency Blood Assistance Needed ### \n' \
                       'Location: {}\n' \
                       '\nHelp Save Lives, Create a better World, a stronger Humanity!!'
 
-pgre_user = 'kishorekolluru'
+pgre_user = 'admin'
 pgre_db = 'bloodemerry'
 pgre_pwd = ''
-pgres_query = "SELECT *FROM loginsignup_donor WHERE city LIKE '{}'"
+pgres_query = "SELECT *FROM loginsignup_donor WHERE lower(city) LIKE '{}'"

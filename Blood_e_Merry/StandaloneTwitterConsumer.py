@@ -127,27 +127,29 @@ class TwilioThread(threading.Thread):
                 quer_city = city
 
             print("USER LOCATION IS {}".format(city))
-            cur.execute(bemconstants.pgres_query.format(quer_city))
+            cur.execute(bemconstants.pgres_query.format(quer_city.lower()))
             user_rows = cur.fetchall()
 
             # for now with Twilio free API we can only send messages to registered numbers and not any number
             # so for nor using dummy for loop for al the users that match the location criteria.
+            cell_num='0'
             for user in user_rows:
                 print('User info : {}'.format(user[1]))
-
-            msg_to_send = bemconstants.twilio_msg_template.format(msg['text'], msg["user_name"], msg["user_screenname"],
-                                                                  msg["user_screenname"],
-                                                                  city)
-            message = self.twilio_client.messages.create(body=msg_to_send,
-                                                         to=bemconstants.mobile_num,
-                                                         from_=bemconstants.twilio_phone_nbr)
-            self.sample_coll.update_one(
-                {"_id": msg['_id']},
-                {'$set': {
-                    'is_expired': True
-                }
-                })
-            print('Sent one message::: {}'.format(msg['text']))
+                cell_num = user[1].replace(' ','').strip()
+                if cell_num is not None and cell_num != '' and len(cell_num) == 10:
+                    msg_to_send = bemconstants.twilio_msg_template.format(msg['text'], msg["user_name"], msg["user_screenname"],
+                                                                          msg["user_screenname"],
+                                                                          city)
+                    message = self.twilio_client.messages.create(body=msg_to_send,
+                                                                 to='+1'+cell_num,
+                                                                 from_=bemconstants.twilio_phone_nbr)
+                    self.sample_coll.update_one(
+                        {"_id": msg['_id']},
+                        {'$set': {
+                            'is_expired': True
+                        }
+                        })
+                    print('Sent one message to {}::: {}'.format(cell_num, msg['text']))
         except ProgrammingError as e:
             print("Exception in send_twilio_sms method!!! \n"+ str(e))
 
