@@ -65,12 +65,12 @@ class EditProfileForm(UserChangeForm):
             'last_name',
             'username',
             'email',
-            'password',
             'blood_group',
             'phone',
             'city',
             'state',
             'country',
+            'password',
         )
         # exclude = ['username', 'password', 'password1', 'password2']
 
